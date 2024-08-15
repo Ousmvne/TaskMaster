@@ -40,3 +40,6 @@ class UserProfile(models.Model):
 
     def get_experience_needed(self):
         return self.level * 100  # Par exemple, 100 points par niveau
+
+    def __str__(self):
+        return f'{self.user.username} - Level {self.level}'

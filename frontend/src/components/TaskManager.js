@@ -3,19 +3,32 @@ import axios from 'axios';
 
 function TaskManager() {
     const [tasks, setTasks] = useState([]);
-    const [newTask, setNewTask] = useState({ title: '', category: 'Work', difficulty: 'E', estimated_duration: '00:30:00' });
+    const [newTask, setNewTask] = useState({
+        title: '',
+        category: 'Work',
+        difficulty: 'E',
+        estimated_duration: '00:30:00',
+    });
 
     useEffect(() => {
-        axios.get('http://localhost:8000/api/tasks/')
-            .then(response => setTasks(response.data))
-            .catch(error => console.error('Error fetching tasks:', error));
+        axios.get('http://localhost:8000/api/tasks/', {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+            }
+        })
+        .then(response => setTasks(response.data))
+        .catch(error => console.error('Error fetching tasks:', error.response ? error.response.data : error.message));
     }, []);
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        axios.post('http://localhost:8000/api/tasks/', newTask)
-            .then(response => setTasks([...tasks, response.data]))
-            .catch(error => console.error('Error creating task:', error));
+        axios.post('http://localhost:8000/api/tasks/', newTask, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+            }
+        })
+        .then(response => setTasks([...tasks, response.data]))
+        .catch(error => console.error('Error creating task:', error.response ? error.response.data : error.message));
     };
 
     return (
@@ -55,7 +68,9 @@ function TaskManager() {
             <ul>
                 {tasks.map(task => (
                     <li key={task.id}>
-                        {task.title} - {task.category} - {task.difficulty === 'E' ? 'Facile' : task.difficulty === 'M' ? 'Moyen' : 'Difficile'} - {task.estimated_duration}
+                        {task.title} - {task.category} - 
+                        {task.difficulty === 'E' ? 'Facile' : task.difficulty === 'M' ? 'Moyen' : 'Difficile'} - 
+                        {task.estimated_duration}
                     </li>
                 ))}
             </ul>
